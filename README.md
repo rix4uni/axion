@@ -4,20 +4,22 @@ A Go CLI tool to control multiple VPS instances via SSH using a YAML configurati
 
 ## Installation
 
-### Quick Install (Recommended)
-
-```bash
+**Using Go:**
+```
 go install github.com/mrmahile/axion@latest
 ```
 
-This will install `axion` to `$GOPATH/bin` (or `$HOME/go/bin` by default). Make sure this directory is in your `PATH`.
+**Pre-built Binaries:**
+```
+wget https://github.com/mrmahile/axion/releases/download/v0.0.1/axion-linux-amd64-0.0.1.tgz
+tar -xvzf axion-linux-amd64-0.0.1.tgz
+mv axion ~/go/bin/
+```
 
-### Build from Source
-
-```bash
-git clone https://github.com/mrmahile/axion.git
-cd axion
-go build -o axion ./cmd/axion
+**From Source:**
+```
+git clone --depth 1 https://github.com/mrmahile/axion.git
+cd axion; go install
 ```
 
 ## Configuration
@@ -35,20 +37,17 @@ credentials:
     ip: "192.168.1.1"
     username: "root"
     password: "yourpassword"
-    secret: "optional_secret_key"
 
   - name: "worker2"
     # Optional: friendly VPS name
     ip: "192.168.1.2"
     username: "admin"
     password: "anotherpassword"
-    secret: "optional_secret_key"
 
   - ip: "192.168.1.3"
     # Name field is optional - IP-only entries work too
     username: "root"
     password: "anotherpassword"
-    secret: "optional_secret_key"
 ```
 
 **Note:** The `name` field is optional. You can use either IP addresses or VPS names (or both). If a VPS name is provided, you can reference the server using the number in its name (e.g., `worker60` → index `60`). The tool matches VPS by extracting the numeric part from their names, so entries don't need to be in sequential order.
@@ -94,6 +93,8 @@ axion -l 1-20 -c "apt install nginx -y"
 - `-i <id>` - Run command on VPS by number. Supports single number or comma-separated list (e.g., `42` or `52,42,53`)
 - `-l <range>` - Run command on multiple VPS in a range (e.g., `1-20`)
 - `-c "<command>"` - Command to execute (required)
+- `-silent` - Silent mode. Suppresses banner output
+- `-version` - Print the version of the tool and exit
 
 ## Validation
 
@@ -148,6 +149,12 @@ axion -l 1-10 -c "systemctl restart nginx"
 
 # Check tmux sessions on specific VPS
 axion -i 52,42,53,56,61,64 -c "tmux ls"
+
+# Run command in silent mode (no banner)
+axion -silent -i 42 -c "uptime"
+
+# Check version
+axion -version
 ```
 
 ## How It Works
